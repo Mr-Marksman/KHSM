@@ -114,4 +114,73 @@ RSpec.describe Game, type: :model do
       expect(game_w_questions.status).to eq(:money)
     end
   end
+
+  describe '#current_game_question' do
+    it 'returns question' do
+      expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[0])
+    end
+  end
+
+  describe '#previous_level ' do
+    it 'returns previous level' do
+      expect(game_w_questions.previous_level).to eq(-1)
+    end
+  end
+
+  describe '#answer_current_question!' do
+    context 'correct answer got' do
+      before(:each) do
+        game_w_questions.answer_current_question!(game_w_questions.current_game_question.correct_answer_key)
+      end
+
+      context 'not final question' do
+        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, current_level: 1) }
+
+        it 'next level' do
+          expect(game_w_questions.current_level).to eq(2)
+        end
+
+        it 'game "in_progress"' do
+          expect(game_w_questions.status).to eq(:in_progress)
+        end
+      end
+
+      context 'final question' do
+        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, current_level: Question::QUESTION_LEVELS.max) }
+
+        it 'final prize' do
+          expect(game_w_questions.prize).to eq(1000000)
+        end
+
+        it 'game won' do
+          expect(game_w_questions.status).to eq(:won)
+        end
+      end
+    end
+
+    context 'wrong answer' do
+      let!(:incorrect_answer_key) { ['a', 'b', 'c', 'd'].
+        reject { |letter| letter == game_w_questions.current_game_question.correct_answer_key }.sample }
+
+      before(:each) do
+        game_w_questions.answer_current_question!(incorrect_answer_key)
+      end
+
+      it 'finishes game' do
+        expect(game_w_questions.finished?).to be true
+      end
+
+      it '"fail"' do
+        expect(game_w_questions.status).to eq :fail
+      end
+    end
+
+    context 'timeout' do
+      let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, created_at: 10.hours.ago, finished_at: Time.now) }
+
+      it 'game "in_progress"' do
+        expect(game_w_questions.status).to eq(:timeout)
+      end
+    end
+  end
 end
