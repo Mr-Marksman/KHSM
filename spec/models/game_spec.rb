@@ -176,7 +176,7 @@ RSpec.describe Game, type: :model do
     end
 
     context 'timeout' do
-      let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, created_at: 10.hours.ago, finished_at: Time.now) }
+      let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, created_at: 10.hours.ago, finished_at: Time.now, is_failed: true) }
 
       it 'game "in_progress"' do
         expect(game_w_questions.status).to eq(:timeout)
