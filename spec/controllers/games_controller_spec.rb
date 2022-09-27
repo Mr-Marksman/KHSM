@@ -24,14 +24,14 @@ RSpec.describe GamesController, type: :controller do
     it 'kick from #answer' do
       put :answer, id: game_w_questions.id
       expect(response.status).not_to eq(200)
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(new_user_session_path)
       expect(flash[:alert]).to be
     end
 
     it 'kick from #take_money' do
       put :take_money, id: game_w_questions.id
       expect(response.status).not_to eq(200)
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(new_user_session_path)
       expect(flash[:alert]).to be
     end
   end
