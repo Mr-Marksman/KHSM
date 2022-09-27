@@ -106,5 +106,26 @@ RSpec.describe GamesController, type: :controller do
       expect(response).to redirect_to(game_path(game_w_questions))
       expect(flash[:alert]).to be
     end
+
+    context 'incorrect answer' do
+      before(:each) do
+        put :answer, letter: "f", id: game_w_questions.id
+      end
+
+      let(:game) { assigns(:game) }
+
+      it 'finishes game with "fail"' do
+        expect(game.finished?).to be true
+        expect(game.status).to be(:fail)
+      end
+
+      it "redirect to user_path" do
+        expect(response).to redirect_to(user_path(user))
+      end
+
+      it 'won prize' do
+        expect(user.balance).to eq game_w_questions.prize
+      end
+    end
   end
 end
