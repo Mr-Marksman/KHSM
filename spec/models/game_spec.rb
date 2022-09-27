@@ -156,6 +156,27 @@ RSpec.describe Game, type: :model do
           expect(game_w_questions.status).to eq(:won)
         end
       end
+
+
+      context "time out" do
+        before(:each) do
+          game_w_questions.answer_current_question!(game_w_questions.current_game_question.correct_answer_key)
+          game_w_questions.created_at = 10.hours.ago
+        end
+
+        let!(:answered_game) do
+          game_w_questions.answer_current_question!(game_w_questions.current_game_question.correct_answer_key)
+          game_w_questions
+        end
+
+        it '"finished?" = true' do
+          expect(answered_game.finished?).to be(true)
+        end
+
+        it '"timeout"' do
+          expect(answered_game.status).to eq(:timeout)
+        end
+      end
     end
 
     context 'wrong answer' do
@@ -172,14 +193,6 @@ RSpec.describe Game, type: :model do
 
       it '"fail"' do
         expect(game_w_questions.status).to eq :fail
-      end
-    end
-
-    context 'timeout' do
-      let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, created_at: 10.hours.ago, finished_at: Time.now, is_failed: true) }
-
-      it 'game "in_progress"' do
-        expect(game_w_questions.status).to eq(:timeout)
       end
     end
   end
