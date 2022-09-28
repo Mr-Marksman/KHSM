@@ -158,7 +158,7 @@ RSpec.describe GamesController, type: :controller do
 
       let(:game) { assigns(:game) }
 
-      context 'add_fifty_fifty' do
+      context '#add_fifty_fifty' do
         let(:values) { game_question.help_hash[:fifty_fifty] }
 
         before(:each) do
@@ -180,7 +180,7 @@ RSpec.describe GamesController, type: :controller do
         end
       end
 
-      context 'add_friend_call' do
+      context '#add_friend_call' do
         let(:value) { game_question.help_hash[:friend_call] }
 
         before(:each) do
