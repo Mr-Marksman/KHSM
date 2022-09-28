@@ -1,9 +1,18 @@
 require 'rails_helper'
-require 'support/my_spec_helper'
+require 'support/my_spec_helper' # наш собственный класс с вспомогательными методами
 
+# Тестовый сценарий для игрового контроллера
+# Самые важные здесь тесты:
+#   1. на авторизацию (чтобы к чужим юзерам не утекли не их данные)
+#   2. на четкое выполнение самых важных сценариев (требований) приложения
+#   3. на передачу граничных/неправильных данных в попытке сломать контроллер
+#
 RSpec.describe GamesController, type: :controller do
+  # обычный пользователь
   let(:user) { FactoryGirl.create(:user) }
+  # админ
   let(:admin) { FactoryGirl.create(:user, is_admin: true) }
+  # игра с прописанными игровыми вопросами
   let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
 
   context 'Anon' do
@@ -139,6 +148,53 @@ RSpec.describe GamesController, type: :controller do
 
       it 'won prize' do
         expect(user.balance).to eq game_w_questions.prize
+      end
+    end
+
+    describe '#help' do
+      let(:game_question) do
+        FactoryGirl.create(:game_question, a: 2, b: 1, c: 4, d: 3)
+      end
+
+      let(:game) { assigns(:game) }
+
+      context 'add_fifty_fifty' do
+        let(:values) { game_question.help_hash[:fifty_fifty] }
+
+        before(:each) do
+          put :help, id: game_w_questions.id, help_type: :fifty_fifty
+          game_question.add_fifty_fifty
+        end
+
+        it 'Remaining variants includes correct variant' do
+          expect(values).to include(game_question.correct_answer_key)
+        end
+
+        it 'Only 2 variants left' do
+          expect(values.size).to eq 2
+        end
+
+        it 'f_f used' do
+          game = assigns(:game)
+          expect(game.fifty_fifty_used).to be true
+        end
+      end
+
+      context 'add_friend_call' do
+        let(:value) { game_question.help_hash[:friend_call] }
+
+        before(:each) do
+          put :help, id: game_w_questions.id, help_type: :friend_call
+          game_question.add_friend_call
+        end
+
+        it 'contains some of variant' do
+          expect(value).to match(/[ABCD]/)
+        end
+
+        it 'f_c used' do
+          expect(game.friend_call_used).to be true
+        end
       end
     end
   end

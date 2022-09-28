@@ -57,22 +57,19 @@ RSpec.describe GameQuestion, type: :model do
     expect(gq.help_hash).to eq({some_key1: 'blabla1', 'some_key2' => 'blabla2'})
   end
 
-  context '#add_fifty_fifty' do
-    it 'create correct f_f help_hash element' do
-      game_question.add_fifty_fifty
-
-      values = game_question.help_hash[:fifty_fifty]
-      expect(values).to include(game_question.correct_answer_key)
-      expect(values.size).to eq 2
-    end
-  end
-
   context '#add_friend_call' do
-    it 'create some f_c help_hash element' do
-        game_question.add_friend_call
+    let(:value) { game_question.help_hash[:friend_call] }
 
-        value = game_question.help_hash[:friend_call]
-        expect(value).to be_kind_of String
+    before(:each) do
+      game_question.add_friend_call
+    end
+
+    it 'contains some of variant' do
+      expect(friend_call).to match_array("A", "B", "C", "D")
+    end
+
+    it 'f_c used' do
+      expect(game.friend_call_used).to be true
     end
   end
 end
