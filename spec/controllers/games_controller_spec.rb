@@ -15,62 +15,6 @@ RSpec.describe GamesController, type: :controller do
   # игра с прописанными игровыми вопросами
   let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
 
-  context 'Anon' do
-    describe 'kick from #show' do
-      before do
-        get :show, id: game_w_questions.id
-      end
-
-      it 'not 200 status' do
-        expect(response.status).not_to eq(200)
-      end
-
-      it 'right redirect' do
-        expect(response).to redirect_to(new_user_session_path)
-      end
-
-      it 'has alert' do
-        expect(flash[:alert]).to be
-      end
-    end
-
-    describe 'kick from #create' do
-      before do
-        post :create
-      end
-
-      it 'not 200 status' do
-        expect(response.status).not_to eq(200)
-      end
-
-      it 'right redirect' do
-        expect(response).to redirect_to(new_user_session_path)
-      end
-
-      it 'has alert' do
-        expect(flash[:alert]).to be
-      end
-    end
-
-    describe 'kick from #answer' do
-      before do
-        put :answer, id: game_w_questions.id
-      end
-
-      it 'not 200 status' do
-        expect(response.status).not_to eq(200)
-      end
-
-      it 'right redirect' do
-        expect(response).to redirect_to(new_user_session_path)
-      end
-
-      it 'has alert' do
-        expect(flash[:alert]).to be
-      end
-    end
-  end
-
   describe 'kick from #take_money' do
     before do
       put :take_money, id: game_w_questions.id
@@ -90,14 +34,35 @@ RSpec.describe GamesController, type: :controller do
   end
 
 
-  context 'Usual user' do
-    let(:game) { assigns(:game) }
 
-    before do
-      sign_in user
+  describe '#create game' do
+
+    context 'Anon' do
+      describe 'kick from #create' do
+        before do
+          post :create
+        end
+
+        it 'not 200 status' do
+          expect(response.status).not_to eq(200)
+        end
+
+        it 'right redirect' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+
+        it 'has alert' do
+          expect(flash[:alert]).to be
+        end
+      end
     end
 
-    describe '#create game' do
+    context 'Usual user' do
+      let(:game) { assigns(:game) }
+
+      before do
+        sign_in user
+      end
       before do
         generate_questions(15)
         post :create
@@ -119,8 +84,16 @@ RSpec.describe GamesController, type: :controller do
         expect(flash[:notice]).to be
       end
     end
+  end
 
-    describe '#show alien game' do
+  describe '#show alien game' do
+
+    context 'Usual user' do
+      let(:game) { assigns(:game) }
+
+      before do
+        sign_in user
+      end
       before do
         alien_game = FactoryGirl.create(:game_with_questions)
         get :show, id: alien_game.id
@@ -138,11 +111,39 @@ RSpec.describe GamesController, type: :controller do
         expect(flash[:alert]).to be # во flash должен быть прописана ошибка
       end
     end
+  end
 
-    describe '#show game' do
+  describe '#show game' do
+
+    context 'Anon' do
+      describe 'kick from #show' do
+        before do
+          get :show, id: game_w_questions.id
+        end
+
+        it 'not 200 status' do
+          expect(response.status).not_to eq(200)
+        end
+
+        it 'right redirect' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+
+        it 'has alert' do
+          expect(flash[:alert]).to be
+        end
+      end
+    end
+
+    context 'Usual user' do
+      let(:game) { assigns(:game) }
+
+      before do
+        sign_in user
+      end
+
       before do
         get :show, id: game_w_questions.id
-        game = assigns(:game)
       end
 
       it 'not finish game' do
@@ -161,12 +162,40 @@ RSpec.describe GamesController, type: :controller do
         expect(response).to render_template('show')
       end
     end
+  end
 
-    describe 'give answer' do
+  describe 'give answer' do
+
+    context 'Anon' do
+      context'kick from #answer' do
+        before do
+          put :answer, id: game_w_questions.id
+        end
+
+        it 'not 200 status' do
+          expect(response.status).not_to eq(200)
+        end
+
+        it 'right redirect' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+
+        it 'has alert' do
+          expect(flash[:alert]).to be
+        end
+      end
+    end
+
+    context 'Usual user' do
+      let(:game) { assigns(:game) }
+
+      before do
+        sign_in user
+      end
+
       context 'answers correct' do
         before do
           put :answer, id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key
-          game = assigns(:game)
         end
 
         it 'not finish game' do
@@ -206,60 +235,66 @@ RSpec.describe GamesController, type: :controller do
           expect(user.balance).to eq game_w_questions.prize
         end
       end
-    end
 
-    context 'takes money' do
-      before do
-        game_w_questions.update_attribute(:current_level, 2)
-        put :take_money, id: game_w_questions.id
-        game = assigns(:game)
-      end
+      context 'takes money' do
 
-      it 'finishes game' do
-        expect(game.finished?).to be true
-      end
-
-      it 'has first prize' do
-        expect(game.prize).to eq(200)
-      end
-
-      context 'after reload' do
         before do
-          user.reload
+          game_w_questions.update_attribute(:current_level, 2)
+          put :take_money, id: game_w_questions.id
         end
 
-        it 'balance save prize' do
-          expect(user.balance).to eq(200)
+        it 'finishes game' do
+          expect(game.finished?).to be true
         end
 
-        it 'right redirect' do
-          expect(response).to redirect_to(user_path(user))
+        it 'has first prize' do
+          expect(game.prize).to eq(200)
         end
 
-        it 'has warning' do
-          expect(flash[:warning]).to be
+        context 'after reload' do
+          before do
+            user.reload
+          end
+
+          it 'balance save prize' do
+            expect(user.balance).to eq(200)
+          end
+
+          it 'right redirect' do
+            expect(response).to redirect_to(user_path(user))
+          end
+
+          it 'has warning' do
+            expect(flash[:warning]).to be
+          end
         end
       end
+
+      it 'try to create second game' do
+        expect(game_w_questions.finished?).to be false
+
+        expect { post :create }.to change(Game, :count).by(0)
+
+        game = assigns(:game)
+        expect(game).to be_nil
+
+        expect(response).to redirect_to(game_path(game_w_questions))
+        expect(flash[:alert]).to be
+      end
     end
+  end
 
-    it 'try to create second game' do
-      expect(game_w_questions.finished?).to be false
+  describe '#help' do
 
-      expect { post :create }.to change(Game, :count).by(0)
+    context 'Usual user' do
+      let(:game) { assigns(:game) }
 
-      game = assigns(:game)
-      expect(game).to be_nil
-
-      expect(response).to redirect_to(game_path(game_w_questions))
-      expect(flash[:alert]).to be
-    end
-
-    describe '#help' do
+      before do
+        sign_in user
+      end
       let(:game_question) do
         FactoryGirl.create(:game_question, a: 2, b: 1, c: 4, d: 3)
       end
-
-      let(:game) { assigns(:game) }
 
       context 'add_audience_help' do
         before do
@@ -329,4 +364,3 @@ RSpec.describe GamesController, type: :controller do
     end
   end
 end
-
