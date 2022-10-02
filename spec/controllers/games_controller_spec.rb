@@ -306,20 +306,12 @@ RSpec.describe GamesController, type: :controller do
           expect(game.finished?).to be false
         end
 
-        it 'not used a_h' do
+        it 'used a_h' do
           expect(game.audience_help_used).to be true
         end
 
         it 'has a help_hash' do
           expect(game.current_game_question.help_hash[:audience_help]).to be
-        end
-
-        it 'contains variants' do
-          expect(game.current_game_question.help_hash[:audience_help].keys).to contain_exactly('a', 'b', 'c', 'd')
-        end
-
-        it 'right redirect' do
-          expect(response).to redirect_to(game_path(game))
         end
       end
 
@@ -331,17 +323,17 @@ RSpec.describe GamesController, type: :controller do
           game_question.add_fifty_fifty
         end
 
-        it 'Remaining variants includes correct variant' do
-          expect(values).to include(game_question.correct_answer_key)
-        end
-
-        it 'Only 2 variants left' do
-          expect(values.size).to eq 2
+        it 'not finish game' do
+          expect(game.finished?).to be false
         end
 
         it 'f_f used' do
           game = assigns(:game)
           expect(game.fifty_fifty_used).to be true
+        end
+
+        it 'has a help_hash' do
+          expect(game.current_game_question.help_hash[:fifty_fifty]).to be
         end
       end
 
@@ -353,12 +345,16 @@ RSpec.describe GamesController, type: :controller do
           game_question.add_friend_call
         end
 
-        it 'contains some of variant' do
-          expect(value).to match(/[ABCD]/)
+        it 'not finish game' do
+          expect(game.finished?).to be false
         end
 
         it 'f_c used' do
           expect(game.friend_call_used).to be true
+        end
+
+        it 'has a help_hash' do
+          expect(game.current_game_question.help_hash[:friend_call]).to be
         end
       end
     end

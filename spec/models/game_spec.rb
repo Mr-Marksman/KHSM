@@ -37,8 +37,8 @@ RSpec.describe Game, type: :model do
         change(GameQuestion, :count).by(15).and(
           # Game.count не должен измениться
           change(Question, :count).by(0)
+          )
         )
-      )
 
       # Проверяем статус и поля
       expect(game.user).to eq(user)
@@ -183,16 +183,49 @@ RSpec.describe Game, type: :model do
       let!(:incorrect_answer_key) { ['a', 'b', 'c', 'd'].
         reject { |letter| letter == game_w_questions.current_game_question.correct_answer_key }.sample }
 
-      before(:each) do
-        game_w_questions.answer_current_question!(incorrect_answer_key)
+        before(:each) do
+          game_w_questions.answer_current_question!(incorrect_answer_key)
+        end
+
+        it 'finishes game' do
+          expect(game_w_questions.finished?).to be true
+        end
+
+        it '"fail"' do
+          expect(game_w_questions.status).to eq :fail
+        end
+      end
+    end
+
+
+  describe '#use_help' do
+    context 'a_h' do
+      before do
+        game_w_questions.stub(:use_help).with(:audience_help)
       end
 
-      it 'finishes game' do
-        expect(game_w_questions.finished?).to be true
+      it 'recieve add_audience_help' do
+        expect(game_w_questions).to have_received(:add_audience_help)
+      end
+    end
+
+    context 'f_f' do
+      before do
+        game_w_questions.use_help(:fifty_fifty)
       end
 
-      it '"fail"' do
-        expect(game_w_questions.status).to eq :fail
+      it 'recieve add_fifty_fifty' do
+        expect(game_w_questions).to receive(:add_fifty_fifty)
+      end
+    end
+
+    context 'f_c' do
+      before do
+        game_w_questions.use_help(:friend_call)
+      end
+
+      it 'recieve add_friend_call' do
+        expect(game_w_questions).to receive(:add_friend_call)
       end
     end
   end
