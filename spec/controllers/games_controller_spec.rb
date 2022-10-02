@@ -289,17 +289,17 @@ RSpec.describe GamesController, type: :controller do
     context 'Usual user' do
       let(:game) { assigns(:game) }
 
-      before do
-        sign_in user
-      end
       let(:game_question) do
         FactoryGirl.create(:game_question, a: 2, b: 1, c: 4, d: 3)
+      end
+
+      before do
+        sign_in user
       end
 
       context 'add_audience_help' do
         before do
           put :help, id: game_w_questions.id, help_type: :audience_help
-          game = assigns(:game)
         end
 
         it 'not finish game' do
@@ -320,7 +320,6 @@ RSpec.describe GamesController, type: :controller do
 
         before do
           put :help, id: game_w_questions.id, help_type: :fifty_fifty
-          game_question.add_fifty_fifty
         end
 
         it 'not finish game' do
@@ -328,12 +327,8 @@ RSpec.describe GamesController, type: :controller do
         end
 
         it 'f_f used' do
-          game = assigns(:game)
-          expect(game.fifty_fifty_used).to be true
-        end
 
-        it 'has a help_hash' do
-          expect(game.current_game_question.help_hash[:fifty_fifty]).to be
+          expect(game.fifty_fifty_used).to be true
         end
       end
 
@@ -342,7 +337,6 @@ RSpec.describe GamesController, type: :controller do
 
         before do
           put :help, id: game_w_questions.id, help_type: :friend_call
-          game_question.add_friend_call
         end
 
         it 'not finish game' do

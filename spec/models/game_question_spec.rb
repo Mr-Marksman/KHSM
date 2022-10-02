@@ -56,4 +56,54 @@ RSpec.describe GameQuestion, type: :model do
 
     expect(gq.help_hash).to eq({some_key1: 'blabla1', 'some_key2' => 'blabla2'})
   end
+
+  describe '#add_audience_help' do
+    before do
+      game_question.add_audience_help
+    end
+
+    it 'has a help_hash' do
+      expect(game_question.help_hash[:audience_help]).to be
+    end
+
+    it 'contains variants' do
+      expect(game_question.help_hash[:audience_help].keys).to contain_exactly('a', 'b', 'c', 'd')
+    end
+  end
+
+  context '#add_fifty_fifty' do
+    let(:values) { game_question.help_hash[:fifty_fifty] }
+
+    before do
+      game_question.add_fifty_fifty
+    end
+
+    it 'has a help_hash' do
+      expect(game_question.help_hash[:fifty_fifty]).to be
+    end
+
+    it 'Remaining variants includes correct variant' do
+      expect(values).to include(game_question.correct_answer_key)
+    end
+
+    it 'Only 2 variants left' do
+      expect(values.size).to eq 2
+    end
+  end
+
+  describe '#add_friend_call' do
+    let(:value) { game_question.help_hash[:friend_call] }
+
+    before do
+      game_question.add_friend_call
+    end
+
+    it 'has a help_hash' do
+      expect(game_question.help_hash[:friend_call]).to be
+    end
+
+    it 'contains some of variant' do
+      expect(value).to match(/считает, что это вариант [ABCD]/)
+    end
+  end
 end
