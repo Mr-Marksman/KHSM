@@ -200,32 +200,23 @@ RSpec.describe Game, type: :model do
 
   describe '#use_help' do
     context 'a_h' do
-      before do
-        game_w_questions.stub(:use_help).with(:audience_help)
-      end
-
       it 'recieve add_audience_help' do
-        expect(game_w_questions).to have_received(:add_audience_help)
+        expect(game_w_questions.current_game_question).to receive(:add_audience_help)
+        game_w_questions.use_help(:audience_help)
       end
     end
 
     context 'f_f' do
-      before do
-        game_w_questions.use_help(:fifty_fifty)
-      end
-
       it 'recieve add_fifty_fifty' do
-        expect(game_w_questions).to receive(:add_fifty_fifty)
+        expect(game_w_questions.current_game_question).to receive(:add_fifty_fifty)
+        game_w_questions.use_help(:fifty_fifty)
       end
     end
 
     context 'f_c' do
-      before do
-        game_w_questions.use_help(:friend_call)
-      end
-
       it 'recieve add_friend_call' do
-        expect(game_w_questions).to receive(:add_friend_call)
+        expect(game_w_questions.current_game_question).to receive(:add_friend_call)
+        game_w_questions.use_help(:friend_call)
       end
     end
   end
