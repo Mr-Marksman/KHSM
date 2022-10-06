@@ -57,7 +57,7 @@ RSpec.describe GameQuestion, type: :model do
     expect(gq.help_hash).to eq({some_key1: 'blabla1', 'some_key2' => 'blabla2'})
   end
 
-  describe '#add_audience_help' do
+  describe '.add_audience_help' do
     before do
       game_question.add_audience_help
     end
@@ -71,7 +71,7 @@ RSpec.describe GameQuestion, type: :model do
     end
   end
 
-  context '#add_fifty_fifty' do
+  context '.add_fifty_fifty' do
     let(:values) { game_question.help_hash[:fifty_fifty] }
 
     before do
@@ -91,7 +91,7 @@ RSpec.describe GameQuestion, type: :model do
     end
   end
 
-  describe '#add_friend_call' do
+  describe '.add_friend_call' do
     let(:value) { game_question.help_hash[:friend_call] }
 
     before do

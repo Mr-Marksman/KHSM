@@ -115,7 +115,7 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#current_game_question' do
+  describe '.current_game_question' do
     it 'returns question' do
       expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[0])
     end
@@ -198,7 +198,7 @@ RSpec.describe Game, type: :model do
     end
 
 
-  describe '#use_help' do
+  describe '.use_help' do
     context 'a_h' do
       it 'recieve add_audience_help' do
         expect(game_w_questions.current_game_question).to receive(:add_audience_help)

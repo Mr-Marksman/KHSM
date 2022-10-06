@@ -114,7 +114,6 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe '#show game' do
-
     context 'Anon' do
       describe 'kick from #show' do
         before do
@@ -165,7 +164,6 @@ RSpec.describe GamesController, type: :controller do
   end
 
   describe 'give answer' do
-
     context 'Anon' do
       context'kick from #answer' do
         before do
@@ -297,7 +295,7 @@ RSpec.describe GamesController, type: :controller do
         sign_in user
       end
 
-      context 'add_audience_help' do
+      describe '.add_audience_help' do
         before do
           put :help, id: game_w_questions.id, help_type: :audience_help
         end
@@ -315,7 +313,7 @@ RSpec.describe GamesController, type: :controller do
         end
       end
 
-      context 'add_fifty_fifty' do
+      describe '.add_fifty_fifty' do
         let(:values) { game_question.help_hash[:fifty_fifty] }
 
         before do
@@ -332,7 +330,7 @@ RSpec.describe GamesController, type: :controller do
         end
       end
 
-      context 'add_friend_call' do
+      describe '.add_friend_call' do
         let(:value) { game_question.help_hash[:friend_call] }
 
         before do
