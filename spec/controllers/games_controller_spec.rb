@@ -307,10 +307,6 @@ RSpec.describe GamesController, type: :controller do
         it 'used a_h' do
           expect(game.audience_help_used).to be true
         end
-
-        it 'has a help_hash' do
-          expect(game.current_game_question.help_hash[:audience_help]).to be
-        end
       end
 
       describe '.add_fifty_fifty' do
@@ -325,7 +321,6 @@ RSpec.describe GamesController, type: :controller do
         end
 
         it 'f_f used' do
-
           expect(game.fifty_fifty_used).to be true
         end
       end
@@ -343,10 +338,6 @@ RSpec.describe GamesController, type: :controller do
 
         it 'f_c used' do
           expect(game.friend_call_used).to be true
-        end
-
-        it 'has a help_hash' do
-          expect(game.current_game_question.help_hash[:friend_call]).to be
         end
       end
     end
